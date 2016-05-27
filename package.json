@@ -1,7 +1,7 @@
 {
-  "name": "VectorGauge",
-  "version": "1.0.1",
-  "description": "Show a gauge meter in Mendix",
+  "name": "Datedropper",
+  "version": "1.0.0",
+  "description": "Show a custom date dropper in Mendix",
   "license": "Apache 2",
   "author": "Rob Duits",
   "private": true,
@@ -20,7 +20,7 @@
     "semver": "^5.1.0",
     "node-mendix-modeler-path": "https://github.com/JelteMX/node-mendix-modeler-path/archive/v1.0.0.tar.gz"
   },
-  "repository": {"type":"git","url":"http://github.com/iamrob-nl/VectorGauge"},
+  "repository": {"type":"git","url":"http://github.com/iamrob-nl/Datedropper"},
   "engines": {
     "node": ">=0.12.0"
   },

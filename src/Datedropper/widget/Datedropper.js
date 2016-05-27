@@ -1,12 +1,12 @@
 /*global logger, Snap, html, domStyle */
 /*
-    VectorGauge
+    Datedropper
     ========================
 
-    @file      : VectorGauge.js
+    @file      : Datedropper.js
     @version   : 1.0.0
     @author    : Rob Duits
-    @date      : 1/28/2016
+    @date      : 5/19/2016
     @copyright : Incentro 2016
     @license   : Apache 2
 
@@ -34,24 +34,20 @@ define([
     "dojo/html",
     "dojo/_base/event",
 
-    "VectorGauge/lib/jquery-1.11.2",
-    "VectorGauge/lib/velocity",
-    "dojo/text!VectorGauge/widget/template/VectorGauge.html"
-], function(declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, _jQuery, velocity, widgetTemplate) {
+    "Datedropper/lib/jquery-1.11.2",
+    "Datedropper/lib/datedropper",
+    "dojo/text!Datedropper/widget/template/Datedropper.html"
+], function(declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, _jQuery, datedropper, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true);
 
     // Declare widget's prototype.
-    return declare("VectorGauge.widget.VectorGauge", [ _WidgetBase, _TemplatedMixin ], {
+    return declare("Datedropper.widget.Datedropper", [ _WidgetBase, _TemplatedMixin ], {
         // _TemplatedMixin will create our dom node using this HTML template.
         templateString: widgetTemplate,
 
         // DOM elements
-        svgGauge: null,
-        gaugeArc: null,
-        gaugeNeedle: null,
-        _i: 0,
 
         // Internal variables. Non-primitives created in the prototype are shared between all widget instances.
         _handles: null,
@@ -105,9 +101,6 @@ define([
         uninitialize: function() {
           logger.debug(this.id + ".uninitialize");
             // Clean up listeners, helper objects, etc. There is no need to remove listeners added with this.connect / this.subscribe / this.own.
-
-            logger.debug("need to redraw SVG");
-            this._resetSVG();
         },
 
         // Attach events to HTML dom elements
@@ -115,102 +108,11 @@ define([
             logger.debug(this.id + "._setupEvents");
         },
 
-        _customColor: function(gaugeArcBackground, gaugeArc, gaugeNeedle) {
-          logger.debug(this.id + "._customColor");
-
-          var color = this._contextObj ? this._contextObj.get(this.ColorPrimaryAttr) : "";
-
-          $(gaugeArcBackground).attr({
-            stroke: color,
-            opacity: 0.25
-          });
-
-          $(gaugeArc).attr({
-            stroke: color
-          });
-
-          $(gaugeNeedle + " polygon:nth-child(1)").attr({
-            fill: color,
-            stroke: "rgba(0, 0, 0, .5)"
-          });
-
-          $(gaugeNeedle + " polygon:nth-child(2)").attr({
-            fill: "#000000",
-            opacity: 0.15
-          });
-
-          $(gaugeNeedle + " circle").attr({
-            fill: color,
-            stroke: "rgba(0, 0, 0, .5)"
-          });
-        },
-
-        _showVariable: function(value, widgetId) {
-          if(this.showValueAttr === true){
-            var valueTxt = widgetId + " #" + this.valueTxt.id;
-            $(valueTxt).text(value);
-          }
-        },
-
-        _drawSVG: function() {
-          logger.debug(this.id + "._drawSVG");
-
-          // Widget configured variables
-          var value = this._contextObj ? Number(this._contextObj.get(this.valueAttr)) : 0;
-          var minValue = this._contextObj ? Number(this._contextObj.get(this.minValueAttr)) : 0;
-          var maxValue = this._contextObj ? Number(this._contextObj.get(this.maxValueAttr)) : 100;
-
-          // Variable SVG elements
-          var widgetId = "#" + this.id;
-          var gaugeArc = widgetId + " #" + this.gaugeArc.id;
-          var gaugeNeedle = widgetId + " #" + this.gaugeNeedle.id;
-          var gaugeArcBackground = widgetId + " #" + this.gaugeArcBackground.id;
-
-          // display minimum and maximum values
-          var minValueTxt = widgetId + " #" + this.minValueTxt.id;
-          $(minValueTxt).text(minValue);
-
-          var maxValueTxt = widgetId + " #" + this.maxValueTxt.id;
-          $(maxValueTxt).text(maxValue);
-
-          if(value >= maxValue){
-            value = maxValue;
-          } else if(value <= minValue) {
-            value = minValue;
-          }
-
-          // show the current variable in the gauge
-          this._showVariable(value, widgetId);
-
-          // Color customisations configured within the Widget
-          this._customColor(gaugeArcBackground, gaugeArc, gaugeNeedle);
-
-          // Calculate the arc rotation in % between 0 - 100
-          var arcLength = $(widgetId + " #" + this.gaugeArc.id).get(0).getTotalLength();
-          var arcString = $(widgetId + " #" + this.gaugeArc.id).attr("d");
-          var archValue = arcLength - ((arcLength / maxValue) * value);
-          var rotationValue = (270 / maxValue) * value;
-
-          // animate the needle
-          $(gaugeNeedle).velocity({
-            rotateZ: rotationValue
-          }, { duration: 1800, delay: 400 });
-
-          $(gaugeArc)
-            .velocity({
-              "stroke-dashoffset": arcLength,
-              "stroke-dasharray": arcLength
-            }, 0)
-            .velocity({
-              "stroke-dashoffset": archValue
-            }, {duration: 1800, delay: 400});
-
-          // Increase this value to make every SVG use unique ID's
-          this.counter.innerHTML = ++this._i;
-        },
-
-        _resetSVG: function () {
-          logger.debug(this.id + "._resetSVG");
+        _initiateDatedropper: function() {
+          logger.debug(this.id + "._initiateDatedropper");
+          // input_datedropper
+          var input = "#"+this.dateInput.id;
+          $(input).dateDropper();
         },
 
         // Rerender the interface.
@@ -219,7 +121,7 @@ define([
 
             // Draw or reload.
             if (this._contextObj !== null) {
-              this._drawSVG();
+              this._initiateDatedropper();
             } else {
                 dojoStyle.set(this.domNode, "display", "none"); // Hide widget dom node.
             }
@@ -282,7 +184,7 @@ define([
             if (this._handles) {
                 dojoArray.forEach(this._handles, function (handle, i) {
                     mx.data.unsubscribe(handle);
-                }); 
+                });
                 this._handles = [];
             }
 
@@ -315,6 +217,6 @@ define([
     });
 });
 
-require(["VectorGauge/widget/VectorGauge"], function() {
+require(["Datedropper/widget/Datedropper"], function() {
     "use strict";
 });
